@@ -4,8 +4,11 @@ const http = require('http');
 const fs = require('fs');
 const url = require('url');
 const path = require('path');
+
 const Eps = require('./lib/eps.js');
 const parseUrl = require('./lib/parseUrl.js');
+const parseCookie = require('./lib/parseCookie.js');
+
 const formRouter = require('./routers/form.js');
 const apiRouter = require('./routers/api.js');
 const indexRouter = require('./routers/index.js');
@@ -21,6 +24,7 @@ app.use('/api', apiRouter);
 const static_regexp = /(\.js|\.css)$/;
 const server = http.createServer(function (req, res) {
 	parseUrl(req, res);
+	parseCookie(req, res);
 	// 判断是否是静态文件
 	if(static_regexp.test(req.pathName)) {
 		// 转发静态文件
