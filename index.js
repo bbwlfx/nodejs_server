@@ -3,8 +3,9 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
+const path = require('path');
 const Eps = require('./lib/eps.js');
-
+const parseUrl = require('./lib/parseUrl.js');
 const formRouter = require('./routers/form.js');
 const apiRouter = require('./routers/api.js');
 const indexRouter = require('./routers/index.js');
@@ -17,7 +18,15 @@ app.use('/baidu', baiduRouter);
 app.use('/form', formRouter);
 app.use('/api', apiRouter);
 
+const static_regexp = /(\.js|\.css)$/;
 const server = http.createServer(function (req, res) {
+	parseUrl(req, res);
+	// 判断是否是静态文件
+	if(static_regexp.test(req.pathName)) {
+		// 转发静态文件
+		serverStatic(req, res);
+		return;
+	}
 	if(app.handle(req, res)) {
 		return ;
 	}
@@ -29,4 +38,15 @@ const server = http.createServer(function (req, res) {
 
 server.listen(4000);
 console.log('server is running');
+
+function serverStatic (req, res) {
+	fs.readFile(path.join(__dirname, 'static', req.pathName),'utf-8' ,function (err, data) {
+		if(err) {
+			res.statusCode = 404;
+			res.end('404');
+			return;
+		}
+		res.end(data);
+	});
+}
 
