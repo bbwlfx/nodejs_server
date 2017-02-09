@@ -15,7 +15,7 @@ let app = new Eps();
 app.use('/', indexRouter);
 app.use('/taobao', taobaoRouter);
 app.use('/baidu', baiduRouter);
-app.use('/form', formRouter);
+app.use('/form', formRouter); 
 app.use('/api', apiRouter);
 
 const static_regexp = /(\.js|\.css)$/;
@@ -40,13 +40,7 @@ server.listen(4000);
 console.log('server is running');
 
 function serverStatic (req, res) {
-	fs.readFile(path.join(__dirname, 'static', req.pathName),'utf-8' ,function (err, data) {
-		if(err) {
-			res.statusCode = 404;
-			res.end('404');
-			return;
-		}
-		res.end(data);
-	});
+	const rs = fs.createReadStream(path.join(__dirname, 'static', req.pathName));
+	rs.pipe(res);
 }
 
